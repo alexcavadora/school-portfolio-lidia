@@ -1,0 +1,432 @@
+IILI06145
+Visualizacion de Informacion
+Basica Disciplinar
+Optativa Disciplinar
+6
+4
+IILI06037
+Desarrollo de Software
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06005
+Almacenes de Datos
+Profundizacion 
+Optativa Opcion Sistemas de Informacion
+6
+4
+SC
+Actividades del Area Complementaria
+Complementaria
+Obligatoria
+5
+0
+SHLI03001
+Administracion de Proyecto de Tesis
+Complementaria
+Optativa Area Complementaria
+3
+2
+IILI06053
+Electronica Digital
+Basica Disciplinar
+Obligatoria
+6
+4
+NELI06001
+Algebra Lineal
+Basica Comun
+Obligatoria
+6
+4
+EALI03015
+Ingenieria Industrial
+Complementaria
+Optativa Area Complementaria
+3
+2
+IILI06089
+Microprocesadores y Microcontroladores
+Basica Disciplinar
+Obligatoria
+6
+4
+SHLI03009
+Desarrollo Humano y Comunicacion
+General
+Obligatoria
+3
+2
+IILI06001
+Administracion de la Tecnologia Informatica
+Profundizacion
+Obligatoria
+6
+4
+IILI06144
+Vision por Computadora
+Profundizacion
+Optativa Opcion IA y Robotica
+6
+4
+IILI06122
+Sistemas de Informacion
+Profundizacion
+Obligatoria
+6
+4
+IILI06114
+Seguridad en Redes
+Profundizacion
+Optativa Opcion Sistemas de Informacion
+6
+4
+IILI06137
+Topico Selecto en Sistemas de Informacion
+Profundizacion
+Optativa Opcion Sistemas de Informacion
+6
+4
+IILI06071
+Instrumentacion Computarizada
+Profundizacion
+Optativa Opcion Informatica Industrial
+6
+4
+ACLI10001
+Inmersion en el Ambiente Laboral
+Complementaria
+Obligatoria
+10
+0
+IILI06003
+Algoritmos de Procesamiento Digital de Señales
+Profundizacion
+Optativa Opcion Informatica Industrial
+6
+4
+IILI06136
+Topico Selecto en Sistemas Computacionales
+Basica Disciplinar
+Optativa Disciplinar
+6
+4
+IILI06004
+Algoritmos y Estructuras de Datos
+Basica Disciplinar
+Obligatoria
+6
+4
+NELI06002
+Calculo Diferencial
+Basica Comun
+Obligatoria
+6
+4
+NELI06004
+Calculo Vectorial y Multivariable
+Basica Comun
+Obligatoria
+6
+5
+IILI06013
+Aplicaciones Internet
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06109
+Reconocimiento de Patrones
+Profundizacion
+Optativa Opcion IA y Robotica
+6
+4
+IILI06107
+Programacion Orientada a Objetos
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06076
+Lenguajes Modernos de Programacion
+Basica Disciplinar
+Optativa Disciplinar
+6
+4
+SHLI01041
+Integracion la Vida Universitaria
+General
+Obligatoria
+1
+1
+IILI06111
+Redes de Computadoras II
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06133
+Topico Selecto en Informatica Industrial
+Profundizacion
+Optativa Opcion Informatica Industrial
+6
+4
+IILI06125
+Sistemas Digitales
+Profundizacion
+Optativa Opcion Informatica Industrial
+6
+4
+SHLI03065
+Seminario de Proyecto de Titulacion
+Complementaria
+Obligatoria
+3
+2
+SHLI03062
+Redaccion de CV y Entrevista de Trabajo
+Complementaria
+Optativa Area Complementaria
+3
+2
+IILI06104
+Programacion en Ingenieria
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06090
+Mineria de Datos
+Profundizacion
+Optativa Opcion Sistemas de Informacion
+6
+4
+NELI06009
+Matematicas Discretas
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06135
+Topico Selecto en Inteligencia Artificial y Robotica
+Profundizacion
+Optativa Opcion IA y Robotica
+6
+4
+IILI06024
+Circuitos Integrados Lineales
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06026
+Computacion Flexible
+Profundizacion
+Optativa Opcion IA y Robotica
+6
+4
+IILI06068
+Ingenieria de Software
+Basica Disciplinar
+Obligatoria
+6
+4
+NELI06010
+Mecanica
+Basica Comun
+Obligatoria
+6
+4
+IILI06027
+Computo en la Nube
+Profundizacion
+Optativa Opcion Sistemas de Informacion
+6
+4
+SC
+Actividades del Area General
+General
+Obligatoria
+8
+0
+IILI06119
+Sistemas de Administracion de Datos
+Basica Disciplinar
+Obligatoria
+6
+4
+SHLI03063
+Responsabilidad Social
+General
+Obligatoria
+3
+2
+IILI06073
+Inteligencia Artificial
+Profundizacion
+Obligatoria
+6
+4
+IILI06064
+Graficos por Computadora
+Basica Disciplinar
+Optativa Disciplinar
+6
+4
+SHLI03018
+Expresion Verbal en Ambiente Profesional
+Complementaria
+Optativa Area Complementaria
+3
+2
+IILI06113
+Robotica Movil
+Profundizacion
+Optativa Opcion IA y Robotica
+6
+4
+EALI06037
+Proyecto en Ingenieria
+Basica Comun
+Obligatoria
+6
+4
+NELI06003
+Calculo Integral
+Basica Comun
+Obligatoria
+6
+4
+IILI06038
+Desarrollo de Software para Sistemas de Control
+Profundizacion 
+Optativa Opcion Informatica Industrial
+6
+4
+IILI06025
+Compiladores
+Basica Disciplinar
+Obligatoria
+6
+4
+NELI06006
+Electromagnetismo y Ondas
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06057
+Filtrado Digital
+Profundizacion
+Optativa Opcion Informatica Industrial
+6
+4
+IILI06127
+Sistemas Operativos
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06051
+Electronica Analogica
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06110
+Redes de Computadoras I
+Basica Disciplinar
+Obligatoria
+6
+4
+IILI06028
+Comunicaciones Digitales
+Profundizacion
+Optativa Opcion Sistemas de Informacion
+6
+4
+SHLI03061
+Redaccion de Articulos Cientificos en Ingles
+Complementaria
+Optativa Area Complementaria
+3
+2
+IILI06102
+Programacion Cientifica
+Basica Disciplinar
+Optativa Disciplinar
+6
+4
+IILI06061
+Fundamentos de los Sistemas de Informacion
+Basica Comun
+Obligatoria
+6
+4
+NELI06016
+Quimica Universitaria
+Basica Comun
+Obligatoria
+6
+4
+NELI06005
+Ecuaciones Diferenciales
+Basica Comun
+Obligatoria
+6
+4
+NELI06014
+Probabilidad y Estadistica
+Basica Comun
+Obligatoria
+6
+4
+IILI02075
+Laboratorio de Mediciones
+Basica Disciplinar
+Obligatoria
+3
+2
+IILI06066
+Informatica Industrial
+Profundizacion
+Obligatoria
+6
+4
+IILI06062
+Fundamentos de los Sistemas Eléctricos
+Basica Disciplinar
+Obligatoria
+6
+4
+EALI03009
+Espiritu Emprendedor
+General
+Obligatoria
+3
+2
+IILI06063
+Geometria Computacional
+Basica Disciplinar
+Optativa Disciplinar
+6
+4
+SHLI03019
+Formacion Cultural e Intercultural
+General
+Obligatoria
+3
+2
+EALI03014
+Ingenieria Economica
+Complementaria
+Optativa Area Complementaria
+3
+2
+NELI04011
+Métodos Numéricos
+Basica Comun
+Obligatoria
+4
+3

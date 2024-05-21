@@ -1,0 +1,33 @@
+DBMS or database management system is a software or technology used to manage data form a database.
+Some examples are:
+MySQL, Oracle, MongoDB, etc.
+
+advantages:
+Data Sharing: Data from the same database can be shared by multiple users at the same time.
+
+Integrity: It allows chaging the data stored in an organized and refined manner.
+
+Data Independence: It allows changing the data structure without changing the composition of executing programs.
+
+Data Security: DBMS comes with the tools to make the storage and transfer of databases secure and reliable. Authentication and encryption are the tools used in DBMS for data security.
+
+There are multiple languages used in DBMS such as: 
+# DDL (Data Definition Language)
+# DML (Data Manipulation Language)
+# DCL (Data Control Language)
+# TCL (Transaction Control Language)
+
+Structured Query Language (SQL) is a language that differs from others in that it can only be used for a specific application, which is relational database management systems. 
+It was first introduced in the 1970s, offering advantages ober the older read-write APIs. Introduced the concept of accessing many records in a single command. And removed the abstraction of the index for particular registries.
+Although a standard exists, none of the current implementations adhere to it and modifies the base language
+
+Relational Model
+
+Represents how data is stored in a relational database. A relational Database consists of a collection of tables, each of which is assigned a unique name. 
+
+Relation in relational Model
+
+
+SQL Domain.
+A domain is essentially a data type with optional constrains. Domains are useful for abstracting common constrains on fields into a single location, for maintenance. For example several tables might contain emial adresses.
+For instance, not null
