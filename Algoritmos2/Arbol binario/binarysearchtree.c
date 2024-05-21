@@ -169,7 +169,7 @@ void inOrder(TREENODE* tree)
         return;
     inOrder(tree->left);
     printf("Clave UDA: %d\n", tree->key); // Assuming key is stored in tree->key
-    printf("Nombre UDA: %s\n", tree->name);
+    printf("Nombre UDA: %s\n", tree->name); //jejecambio
     printf("Tipo UDA: %s\n", tree->registro->TipoUDA);
     printf("Area UDA: %s\n", tree->registro->AreaUDA);
     printf("Numero de creditos: %u\n", tree->registro->NumCred);
