@@ -1,0 +1,15 @@
+selección de características:
+puede ser supervisada o no...
+-> la selección de los subconjuntos de características más representativos para el reconocimiento de patrones en una base de datos usa métodos óptimos y sub-óptimos
+
+optimal methods: exhaustive search, useful when using a reduced dataset for example in monte carlo and tree based algorithms.
+suboptimal methods: balances between computational cost and optimization of data.
+
+procedimiento de nodos y ramas:
+se basa en el criterio: si X es un subconjunto de Y, entonces se implica lógicamente que
+J(X) < J(Y)
+donde:
+J es una función crítica de evaluación la cual requiere ser optimizada.
+
+método de single-linkage:
+este enlace utiliza la distancia mínima entre los datos de entrada y los divide en subramas de acuerdo a un umbral mínimo de separación. 

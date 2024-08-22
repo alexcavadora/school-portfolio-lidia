@@ -1,0 +1,60 @@
+docker run:
+intentará correr un contenedor existente, si no lo encuentra, lo buscará en línea con docker pull 
+
+corre el proceso en el fondo
+			|
+			|
+			|
+			|	 			nombre del contenedor	banderas del contenedor
+			| 						|						|
+			v 						v						v
+
+docker run -d -p 3306:3306 --name docker-mysql MYSQL_ROOT_PASSWORD=root arm64v8/mysql
+					
+					|														^
+					|														|
+					|												plantilla a usar
+					v 							(usé arm64v8 por tener esa arquitectura)
+puerto de su computadora IP privada
+ 			|
+ 			v
+ 	  -p   ####:####
+ 		   		  ^
+ 		   		  |
+    puerto del contenedor de docker IP pública
+
+
+base de datos ready:
+memoria ram / cache 
+utilizada para datos de uso común como netflix o facebook
+
+#ejecutar instrucciones en un dado contenedor:
+ $ docker exec -i -t nombre-del-contenedor aplicación-a-ejecutar -banderas (opcional)
+ 				^  ^
+ 				|  |
+crear contenedor interactivo y con terminal 
+
+#ejemplo con el contenedor de mysql creado
+ $ docker excec -i -t  docker-mysql mysql -u root -p
+# esto ejecuta en la terminal del contenedor creado un login de mysql y ahi podemos hacer todas las instrucciones que queramos
+
+
+[] docker stats
+# da los stats de uso del cpu y memoria para usos de monitoreo
+
+[] docker logs <contenedor>
+# da los logs
+
+[] docker 
+
+[] docker run -d -p 8081:80 --name nginx-site -v $(pwd):/usr/share/nginx/html nginx
+
+esto es para abrir un servidor en nginx, el pwd debe ser un directorio cualquiera donde se tenga una página index.html, lo que hace la instrucción -v son dos cosas: primero, es hacer el contenedor "permanente" ya que no se borrará todo al cerrar el contenedor, e incluso al cerrarlo, si se mantiene la carpeta de origen en nuestra computadora local, segundo es mapear cualquier directorio local a un directorio en el contenedor, se usa esta carpeta /usr/share/nginx/html ya que es la estándar para este servidor pero esa parte realmente encuentra en el contenedor, no tenemos que instalar nginx ni apache en nuestro equipo para crearlo
+
+para visualizar index.html, podemos ir al navegador e ir a localhost:8081 (nginx) o localhost:8080 (apache):
+
+
+[] docker run -d -p 8080:80 --name apache-site -v $(pwd):/usr/local/apache2/htdocs/ httpd
+
+abrir un server de apache
+#mínimo para desarrollador backend html, javascript, css

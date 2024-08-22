@@ -1,0 +1,46 @@
+Paralel Programming 
+con el cpu (real) switcheando entre procesos, el tiempo que toma a cada proceso realizar su tarea de cómputo no es uniforme
+tampoco se puede reproducir el tiempo reuerido si el proceso de corre nuevamente
+tampoco pueden ser construidos asumendo tiemps de cómputo
+cuando un proceso tiene requerimientos de tiempo real, se deben tomar otras medidas
+la mayoría de los procesos
+
+Proceso vs Programa 
+Hay una sutil diferencia entre un proceso y un progama.
+un programa es un algoritmo, expresado en cierta notación. Puede almacenarse en un disco sin que haga nada.
+El proceso es actividad. Consta de un programa, entradas, salidas y estados.
+Un programa ejecutado dos veces, equivale a dos procesos.
+
+What is a Stack?
+A stack is a special area of computer’s memory which stores temporary variables created by a function. In stack, variables are declared, stored and initialized during runtime.
+
+It is a temporary storage memory. When the computing task is complete, the memory of the variable will be automatically erased. The stack section mostly contains methods, local variable, and reference variables.
+
+What is Heap? 
+The heap is a memory used by programming languages to store global variables. By default, all global variable are stored in heap memory space. It supports Dynamic memory allocation.
+región crítica (candado)- los hilos se bloquean al acceder a esta memoria, es preferible no usar esta memoria para evitar realentizar la memoria.
+
+
+The heap is not managed automatically for you and is not as tightly managed by the CPU. It is more like a free-floating region of memory.
+
+Estados de los procesos:
+Ready - listo para ejecutarse
+
+un hilo es un elemento de un proceso 
+un proceso puede tener múltiples hilos.
+Comparten recursos y memoria con el proceso
+Cada hilo es una secuencia de instrucciones que pueden correr independientemente de otros hilos
+El planificador de hilos se encarga de darles prioritización
+
+Aplicaciones
+Buscar que una aplicación compleja o tardada se reparta entre varios hilos.
+Los hilos se ejecutan hasta 100 veces más rápidas que los procesos.
+
+Separar una tarea en 2 procesos o una tarea compleja en varios hilos (llamadas al sistema)
+ejemplo. en word se tienen varios hilos: renderizar los caracteres
+autocorreción
+ formatear el documento
+ respaldar el documento en el disco
+
+
+
