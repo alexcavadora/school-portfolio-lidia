@@ -1,13 +1,11 @@
 #include<iostream>
 #include<thread>
-#include<mutex> //variable atómica que puedo modificar o no, pero no se puede quedar a medias.
+#include <>
+float matrix [4096];
 
-//región crítica------
-std::mutex cr_mutex;
-//--------------------
 void hello(int n)
 {
-    std::cout << "Hello, world!, desde el hilo "<< n << "\n";
+    std::cout << "Hello, world!, desde el hilo " << n << std::endl;
     return;
 }
 
@@ -32,12 +30,6 @@ int main(int argc, char** argv)
     for (int i = 0; i < nthreads; i++)
     {
         list[i] = std::thread(hello, i+1);
-    }
-
-    for (int i = 0; i < nthreads; i++)
-    {
-
-        ;
     }
 
     // std::thread t1(hello, 1);
