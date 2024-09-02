@@ -11,13 +11,14 @@ unsigned g_vcols = 0;
 unsigned g_vrows = 0;
 unsigned* g_vector = NULL;
 
-unsigned* g_result = NULL;
+unsigned* g_vresult = NULL;
 // *** ------------------ ***
 
 void print_help(void)
 {
     printf("usage matm <matrix> <vector> \n");
     exit(1);
+
 }
 
 void error_msg(const char* msg, unsigned err)
@@ -33,7 +34,7 @@ unsigned* load_matrix(char* filename, unsigned* num_of_rows, unsigned* num_of_co
     if (file_descriptor == NULL) return NULL;
 
     char buffer[BUFSIZ]; //buffer para leer una sola línea
-    unsigned rows, cols; //variables para almacenar las dimensiones
+    unsigned rows, cols; //variables para almacenar las dimensiones
 
     if(fgets(buffer, BUFSIZ, file_descriptor) == NULL) goto fail;
     rows = atoi(buffer);
@@ -43,7 +44,7 @@ unsigned* load_matrix(char* filename, unsigned* num_of_rows, unsigned* num_of_co
 
     unsigned size = rows*cols;
     if (size == 0) goto fail;
-    matrix = malloc(size*sizeof(int));
+    matrix = malloc(size*sizeof(unsigned));
     if (matrix == NULL) goto fail;
 
 
@@ -79,15 +80,15 @@ void print_matrix(unsigned* matrix, unsigned rows, unsigned cols)
 void* row_times_column(void* args)
 {
     unsigned* row = (unsigned*) args;
-    unsigned index = (int)(row - g_matrix)/g_mcols;
+    unsigned index = (unsigned)(row - g_matrix) / g_mcols;
 
     unsigned y = 0;
     for (unsigned i = 0; i < g_mcols; i++)
     {
-        printf("%u*%u\n", row[i], g_vector[i]);
         y += row[i] * g_vector[i];
+
     }
-    g_result[index] = y;
+    g_vresult[index] = y;
     return NULL;
 }
 
@@ -103,14 +104,11 @@ int main(int argc, char** argv)
     g_vector = load_matrix(vector_file, &g_vrows, &g_vcols);
     if (g_vector == NULL) error_msg("Wrong vector", 3);
 
-    print_matrix(g_matrix, g_mrows, g_mcols);
-    print_matrix(g_vector, g_vrows, g_vcols);
-
     if(g_mcols != g_vrows) error_msg("Uncompatible dimensions", 4);
 
-    g_result = malloc(g_mcols * sizeof(int));
+    g_vresult = malloc(g_mrows * sizeof(unsigned));
 
-    pthread_t* threadls = malloc(g_mrows*sizeof(pthread_t));
+    pthread_t* threadls = malloc(g_mrows * sizeof(pthread_t));
     if (threadls == NULL) error_msg("Threads Alloc fail", 5);
 
     for(unsigned i = 0; i<g_mrows; i++)
@@ -120,10 +118,11 @@ int main(int argc, char** argv)
         pthread_join(threadls[i], NULL);
 
     printf("Result: \n");
+    print_matrix(g_vresult, g_mrows, g_vcols);
     if (g_matrix != NULL) free(g_matrix);
     if (g_vector != NULL) free(g_vector);
-    if (g_result != NULL) free(g_result);
-    print_matrix(g_result, g_mrows, g_vcols);
+    if (g_vresult != NULL) free(g_vresult);
+
     return 0;
 }
 
