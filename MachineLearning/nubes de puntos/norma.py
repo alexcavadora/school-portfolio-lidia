@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import open3d as o3d
 import numpy as np
-import os
 
 def rotate_view(vis):
     ctr = vis.get_view_control()
@@ -16,7 +15,7 @@ def read_and_clean(file, umin, umax, norm,  y_start):
     #visualize noisy image
     # pcd = o3d.geometry.PointCloud()
     # pcd.points = o3d.utility.Vector3dVector(X)
-    # o3d.visualization.draw_geometries([pcd])
+    # o3d.visualization.draw_geometries([pcd])
 
     l1_norms = np.sum(np.abs(X), axis=1)
     l2_norms = np.linalg.norm(X, axis=1)
@@ -48,150 +47,179 @@ def compute_curvature(pcd):
     for i in range(len(pcd.points)):
         [_, idx, _] = kdtree.search_knn_vector_3d(pcd.points[i], 30)
         k_neighbors = np.asarray(pcd.points)[idx, :]
-
-        # Compute the covariance matrix
         covariance = np.cov(k_neighbors, rowvar=False)
-
-        # Eigen decomposition of the covariance matrix
         eigenvalues, _ = np.linalg.eigh(covariance)
-
-        # Curvature is given by the ratio of the smallest eigenvalue to the sum of the eigenvalues
         curvature = eigenvalues[0] / np.sum(eigenvalues)
         curvatures.append(curvature)
 
     return np.array(curvatures)
+
+def compute_concavity(pcd):
+    convex_hull = pcd.compute_convex_hull()[0]
+    convex_hull_volume = convex_hull.get_volume()
+    pcd_volume = pcd.get_oriented_bounding_box().volume()
+    concavity_value = convex_hull_volume - pcd_volume
+    return concavity_value
+
+def compute_compactness(pcd, volume):
+    surface_area = pcd.get_surface_area()
+    compactness_value = volume / surface_area
+    return compactness_value
+
+def compute_sphericity(pcd, volume):
+    surface_area = pcd.get_surface_area()
+    radius = (3 * volume / (4 * np.pi)) ** (1/3)
+    sphere_surface_area = 4 * np.pi * radius ** 2
+    sphericity_value = surface_area / sphere_surface_area
+    return sphericity_value
+
+def compute_roughness(pcd):
+    kdtree = o3d.geometry.KDTreeFlann(pcd)
+    points = np.asarray(pcd.points)
+    roughness_values = []
+
+    for i in range(points.shape[0]):
+        [_, idx, _] = kdtree.search_knn_vector_3d(pcd.points[i], 30)
+        neighbors = points[idx[1:], :]
+        dists = np.linalg.norm(neighbors - points[i], axis=1)
+        roughness_values.append(dists.mean())
+
+    roughness_value = np.mean(roughness_values)
+    return roughness_value
+
 file = ""
 def visualize(file, umin, umax, norm, y_start, n_sample):
     filtered_points = read_and_clean(file, umin, umax, norm, y_start)
     if n_sample > filtered_points.shape[0]:
         n_sample = filtered_points.shape[0]
     filtered_points = filtered_points[np.random.choice(filtered_points.shape[0], n_sample, replace=False)]
+    
+
     pcd = o3d.geometry.PointCloud()
     pcd.points = o3d.utility.Vector3dVector(filtered_points)
-
-
+    
     curvatures = compute_curvature(pcd)
-    pcd.colors = o3d.utility.Vector3dVector(plt.cm.jet(curvatures / max(curvatures))[:, :3])
-
-    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
-
-    #pcd.orient_normals_consistent_tangent_plane(100)
-    points = np.asarray(pcd.points)
+    #pcd.colors = o3d.utility.Vector3dVector(plt.cm.jet(curvatures / max(curvatures))[:, :3])
+    
+    
+    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.05, max_nn=40))
+    
+   
     normals = np.asarray(pcd.normals)
     curvatures = np.asarray(curvatures).reshape(-1, 1)
 
+   
     mean_normals = normals.mean(axis=0)
+    
+    
     mean_curvature = curvatures.mean()
 
-    aabb = pcd.get_axis_aligned_bounding_box()
-    aabb.color = (1, 0, 0)
-    aabb_min_bound = aabb.get_min_bound()
-    aabb_max_bound = aabb.get_max_bound()
-    aabb_extent = aabb_max_bound - aabb_min_bound
-
     obb = pcd.get_oriented_bounding_box()
-    obb.color = (0, 1, 0)
-    obb_min_bound = obb.get_min_bound()
-    obb_max_bound = obb.get_max_bound()
-    obb_extent = obb_max_bound - obb_min_bound
+    obb_extent = obb.get_extent()
 
-    aabb_width, aabb_height, aabb_depth = aabb_extent
-    obb_width, obb_height, obb_depth = obb_extent
+  
+    obb_volume = obb_extent[0] * obb_extent[1] * obb_extent[2]
 
-    major_axis_horizontal = max(obb_width, obb_height, obb_depth)
-    major_axis_vertical = min(obb_width, obb_height, obb_depth)
+   
+    major_axis_horizontal = max(obb_extent)
+
+    major_axis_vertical = min(obb_extent)
+
+    concavity = compute_concavity(pcd)
+
+    compactness = compute_compactness(pcd, obb_volume)
+
+    sphericity = compute_sphericity(pcd)
+
+    roughness = compute_roughness(pcd)
+
 
     single_row_data = np.hstack([
-        mean_normals,
-        mean_curvature,
-        aabb_width, aabb_height, aabb_depth,
-        obb_width, obb_height, obb_depth,
-        major_axis_horizontal, major_axis_vertical, target
+        mean_normals,               # 3 features: mean normal vector components (x, y, z)
+        mean_curvature,             # 1 feature: mean curvature
+        obb_extent,                 # 3 features: OBB extents (width, height, depth)
+        obb_volume,                 # 1 feature: OBB volume
+        major_axis_horizontal,      # 1 feature: OBB major axis horizontal
+        major_axis_vertical,        # 1 feature: OBB major axis vertical
+        concavity,                  # 1 feature: concavity
+        compactness,                # 1 feature: compactness
+        sphericity,                 # 1 feature: sphericity
+        roughness                   # 1 feature: roughness
     ])
 
     single_row_data = single_row_data.reshape(1, -1)
+    
     return single_row_data
 
-names = ['csvs/lata/lata', 'csvs/casco/casco','csvs/oso/osof',
-        'csvs/piedra/piedraf','csvs/sombrilla/sombrilla','csvs/audifonos/audi',
-        'csvs/unicel_l2/unicel','csvs/zapato_l2/zapato']
-sample_size = [5000, 10000, 15000, 25000]
+names = ['200/audifonos_200/audifonos', '200/carro_200/carro','200/bolsa_200/bolsa',
+        '200/bota_200/bota','200/molcajete_200/molcajete','200/teclado_200/teclado',
+        '200/unicel_l2/unicel','200/zapato_l2/zapato']
+sample_size = [15000, 25000]
 all_data=[]
 
 target = 0
-
-umbral_min = 0.3
+umbral_min = 0.0
 umbral_max = 0.6
-for i in range(1, 11):
+for i in range(1, 201):
      for j in sample_size:
         data = visualize(names[0] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-        data = visualize(names[0] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-target = 1
-umbral_min = 0.37
-umbral_max = 0.65
-for i in range(1, 11):
-     for j in sample_size:
-        data = visualize(names[1] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-        data = visualize(names[1] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-target = 2
-umbral_min = 0.37
-umbral_max = 0.65
-for i in range(1, 11):
-     for j in sample_size:
-        data = visualize(names[2] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-        data = visualize(names[2] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-target = 3
-umbral_min = 0.1
-umbral_max = 2.0
-for i in range(1, 11):
-    for j in sample_size:
-        data = visualize(names[3] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-        data = visualize(names[3] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-target = 4
-umbral_min = 0.1
-umbral_max = 2.0
-for i in range(1, 11):
-    for j in sample_size:
-        data = visualize(names[4] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-        data = visualize(names[4] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-target = 5
-umbral_min = 0.1
-umbral_max = 2.0
-for i in range(1, 11):
-    for j in sample_size:
-        data = visualize(names[5] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-        data = visualize(names[5] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-target = 6
-umbral_min = 0.1
-umbral_max = 2.0
-for i in range(1, 11):
-    for j in sample_size:
-        data = visualize(names[6] + str(i) + '.csv', umbral_min, umbral_max, 2, 0.0, j)
-        all_data.append(data)
-        data = visualize(names[6] + str(i) + '.csv', umbral_min, umbral_max, 2, 0.0, j)
         all_data.append(data)
 
-target = 7
-umbral_min = 0.1
-umbral_max = 2.0
-for i in range(1, 11):
+target = 1
+umbral_min = 0.0
+umbral_max = 10.05
+for i in range(1, 201):
+     for j in sample_size:
+        data = visualize(names[1] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
+        all_data.append(data)
+
+target = 2
+umbral_min = 0.07
+umbral_max = 10.05
+for i in range(1, 201):
+     for j in sample_size:
+        data = visualize(names[2] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
+        all_data.append(data)
+
+target = 3
+umbral_min = 0.0
+umbral_max = 10.0
+for i in range(1, 201):
     for j in sample_size:
-        data = visualize(names[7] + str(i) + '.csv', umbral_min, umbral_max, 2, 0.0, j)
+        data = visualize(names[3] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
         all_data.append(data)
-        data = visualize(names[7] + str(i) + '.csv', umbral_min, umbral_max, 2, 0.0, j)
+
+target = 4
+umbral_min = 0.0
+umbral_max = 10.0
+for i in range(1, 201):
+    for j in sample_size:
+        data = visualize(names[4] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
         all_data.append(data)
+
+target = 5
+umbral_min = 0.0
+umbral_max = 10.0
+for i in range(1, 201):
+    for j in sample_size:
+        data = visualize(names[5] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
+        all_data.append(data)
+
+# target = 6
+# umbral_min = 0.0
+# umbral_max = 10.0
+# for i in range(1, 201):
+#     for j in sample_size:
+#         data = visualize(names[6] + str(i) + '.csv', umbral_min, umbral_max, 2, 0.0, j)
+#         all_data.append(data)
+
+# target = 7
+# umbral_min = 0.0
+# umbral_max = 10.0
+# for i in range(1, 201):
+#     for j in sample_size:
+#         data = visualize(names[7] + str(i) + '.csv', umbral_min, umbral_max, 2, 0.0, j)
+#         all_data.append(data)
 
 combined = np.vstack(all_data)
 output_file = 'output/database.csv'
