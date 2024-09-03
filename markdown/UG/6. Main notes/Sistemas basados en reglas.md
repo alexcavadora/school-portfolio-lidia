@@ -1,4 +1,4 @@
-#clase5to 
+[[Clases de 5to semestre]] [[notas  de clases]]
 # Fundamentos de los sistemas basados en reglas
 La representación en espacio de estados es útil aún en proglemas no muy bien estructurados y forma la base de la mayoría de los métodos clásicos de la IA. Términos utilizados comunmente en esta clase:
 

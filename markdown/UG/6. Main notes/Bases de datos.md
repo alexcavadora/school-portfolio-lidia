@@ -1,4 +1,4 @@
-#clase5to
+[[Clases de 5to semestre]] [[notas  de clases]]
 ## Fundamentos de las bases de datos:
 
 **Atomicity**: This means that each database transaction must be treated as a single, indivisible unit. Either all or none of the changes made by the transaction are applied to the database.
