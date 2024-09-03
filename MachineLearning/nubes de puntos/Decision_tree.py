@@ -5,7 +5,7 @@ import time
 
 start_time = time.time()
 
-data = pd.read_csv('output/database.csv')
+data = pd.read_csv('output/database2.csv')
 print(data)
 
 X = data.drop(['Target'], axis = 1)

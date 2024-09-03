@@ -1,141 +1,125 @@
-import matplotlib.pyplot as plt
-import open3d as o3d
 import numpy as np
+import scipy.spatial as spatial
+from sklearn.decomposition import PCA
+import time
 
-def rotate_view(vis):
-    ctr = vis.get_view_control()
-    ctr.rotate(0.0, 2.0)
-    return True
+start = time.time()
 
-def read_and_clean(file, umin, umax, norm,  y_start):
+def read_and_clean(file, umin, umax, norm, y_start):
     X = np.genfromtxt(file, delimiter=',')
-    #x, y, z = X[1:], X[2:], X[3:]
-    # show read data
-
-    #visualize noisy image
-    # pcd = o3d.geometry.PointCloud()
-    # pcd.points = o3d.utility.Vector3dVector(X)
-    # o3d.visualization.draw_geometries([pcd])
-
     l1_norms = np.sum(np.abs(X), axis=1)
     l2_norms = np.linalg.norm(X, axis=1)
-    umbral_min = umin
-    umbral_max = umax
-
-    l1_mask = (l1_norms >= umbral_min) & (l1_norms <= umbral_max)
-
-    l2_mask = (l2_norms >= umbral_min) & (l2_norms <= umbral_max)
-    if y_start == 0:
-        y_mask =   True
-    else:
-        y_mask = X[:, 1] < y_start
-    l1_mask = l1_mask & y_mask
-    l2_mask = l2_mask & y_mask
+    l1_mask = (l1_norms >= umin) & (l1_norms <= umax)
+    l2_mask = (l2_norms >= umin) & (l2_norms <= umax)
+    y_mask = X[:, 1] < y_start if y_start != 0 else np.ones(X.shape[0], dtype=bool)
+    l1_mask &= y_mask
+    l2_mask &= y_mask
 
     if norm == 1:
         filtered_points = X[l1_mask]
     elif norm == 2:
         filtered_points = X[l2_mask]
     else:
-        filtered_points = []
+        filtered_points = np.array([])
+
     return filtered_points
 
-def compute_curvature(pcd):
-    kdtree = o3d.geometry.KDTreeFlann(pcd)
+def compute_curvature(points, k=30):
+    kdtree = spatial.KDTree(points)
     curvatures = []
 
-    for i in range(len(pcd.points)):
-        [_, idx, _] = kdtree.search_knn_vector_3d(pcd.points[i], 30)
-        k_neighbors = np.asarray(pcd.points)[idx, :]
-        covariance = np.cov(k_neighbors, rowvar=False)
-        eigenvalues, _ = np.linalg.eigh(covariance)
+    for i in range(len(points)):
+        _, idx = kdtree.query(points[i], k=k)
+        neighbors = points[idx]
+        covariance = np.cov(neighbors, rowvar=False)
+        eigenvalues = np.linalg.eigh(covariance)[0]
         curvature = eigenvalues[0] / np.sum(eigenvalues)
         curvatures.append(curvature)
 
     return np.array(curvatures)
 
-def compute_concavity(pcd):
-    convex_hull = pcd.compute_convex_hull()[0]
-    convex_hull_volume = convex_hull.get_volume()
-    pcd_volume = pcd.get_oriented_bounding_box().volume()
-    concavity_value = convex_hull_volume - pcd_volume
-    return concavity_value
+def estimate_normals(points):
+    pca = PCA(n_components=3)
+    pca.fit(points)
+    normals = pca.components_[2]  # The third component is the normal direction
+    return normals
 
-def compute_compactness(pcd, volume):
-    surface_area = pcd.get_surface_area()
-    compactness_value = volume / surface_area
-    return compactness_value
+def compute_convex_hull_volume(points):
+    hull = spatial.ConvexHull(points)
+    return hull.volume
 
-def compute_sphericity(pcd, volume):
-    surface_area = pcd.get_surface_area()
+def compute_actual_volume(points):
+    """
+    Approximate the actual volume enclosed by the point cloud using Delaunay triangulation.
+    """
+    delaunay = spatial.Delaunay(points)
+    simplices = delaunay.simplices
+    tetrahedra = points[simplices]
+
+    def tetrahedron_volume(tetra):
+        """
+        Calculate the volume of a tetrahedron given its vertices.
+        """
+        a, b, c, d = tetra
+        return np.abs(np.dot(a - d, np.cross(b - d, c - d))) / 6.0
+
+    volumes = np.array([tetrahedron_volume(tetra) for tetra in tetrahedra])
+    return np.sum(volumes)
+
+def compute_concavity(points):
+    convex_hull_volume = compute_convex_hull_volume(points)
+    actual_volume = compute_actual_volume(points)
+    concavity = convex_hull_volume - actual_volume
+    return concavity
+
+def compute_compactness(volume, area):
+    return volume / area
+
+def compute_sphericity(volume, area):
     radius = (3 * volume / (4 * np.pi)) ** (1/3)
     sphere_surface_area = 4 * np.pi * radius ** 2
-    sphericity_value = surface_area / sphere_surface_area
-    return sphericity_value
+    return area / sphere_surface_area
 
-def compute_roughness(pcd):
-    kdtree = o3d.geometry.KDTreeFlann(pcd)
-    points = np.asarray(pcd.points)
+def compute_roughness(points, k=30):
+    kdtree = spatial.KDTree(points)
     roughness_values = []
 
     for i in range(points.shape[0]):
-        [_, idx, _] = kdtree.search_knn_vector_3d(pcd.points[i], 30)
-        neighbors = points[idx[1:], :]
+        _, idx = kdtree.query(points[i], k=k)
+        neighbors = points[idx[1:]]
         dists = np.linalg.norm(neighbors - points[i], axis=1)
         roughness_values.append(dists.mean())
 
-    roughness_value = np.mean(roughness_values)
-    return roughness_value
+    return np.mean(roughness_values)
 
-file = ""
-def visualize(file, umin, umax, norm, y_start, n_sample):
+def visualize(file, umin, umax, norm, y_start, n_sample, target):
     filtered_points = read_and_clean(file, umin, umax, norm, y_start)
     if n_sample > filtered_points.shape[0]:
         n_sample = filtered_points.shape[0]
     filtered_points = filtered_points[np.random.choice(filtered_points.shape[0], n_sample, replace=False)]
-    
 
-    pcd = o3d.geometry.PointCloud()
-    pcd.points = o3d.utility.Vector3dVector(filtered_points)
-    
-    curvatures = compute_curvature(pcd)
-    #pcd.colors = o3d.utility.Vector3dVector(plt.cm.jet(curvatures / max(curvatures))[:, :3])
-    
-    
-    pcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.05, max_nn=40))
-    
-   
-    normals = np.asarray(pcd.normals)
-    curvatures = np.asarray(curvatures).reshape(-1, 1)
-
-   
-    mean_normals = normals.mean(axis=0)
-    
-    
+    curvatures = compute_curvature(filtered_points)
     mean_curvature = curvatures.mean()
 
-    obb = pcd.get_oriented_bounding_box()
-    obb_extent = obb.get_extent()
+    normals = estimate_normals(filtered_points)
+    mean_normals = normals.mean(axis=0)
 
-  
-    obb_volume = obb_extent[0] * obb_extent[1] * obb_extent[2]
+    obb = spatial.ConvexHull(filtered_points)
+    obb_volume = obb.volume
+    obb_extent = np.ptp(filtered_points, axis=0)
 
-   
     major_axis_horizontal = max(obb_extent)
-
     major_axis_vertical = min(obb_extent)
 
-    concavity = compute_concavity(pcd)
+    concavity = compute_concavity(filtered_points)
 
-    compactness = compute_compactness(pcd, obb_volume)
-
-    sphericity = compute_sphericity(pcd)
-
-    roughness = compute_roughness(pcd)
-
+    surface_area = obb.area
+    compactness = compute_compactness(obb_volume, surface_area)
+    sphericity = compute_sphericity(obb_volume, surface_area)
+    roughness = compute_roughness(filtered_points)
 
     single_row_data = np.hstack([
-        mean_normals,               # 3 features: mean normal vector components (x, y, z)
+        mean_normals,  # Mean normal vectors
         mean_curvature,             # 1 feature: mean curvature
         obb_extent,                 # 3 features: OBB extents (width, height, depth)
         obb_volume,                 # 1 feature: OBB volume
@@ -144,84 +128,34 @@ def visualize(file, umin, umax, norm, y_start, n_sample):
         concavity,                  # 1 feature: concavity
         compactness,                # 1 feature: compactness
         sphericity,                 # 1 feature: sphericity
-        roughness                   # 1 feature: roughness
+        roughness,                  # 1 feature: roughness
+        target
     ])
+    return single_row_data.reshape(1, -1)
 
-    single_row_data = single_row_data.reshape(1, -1)
-    
-    return single_row_data
-
+# Processing data
 names = ['200/audifonos_200/audifonos', '200/carro_200/carro','200/bolsa_200/bolsa',
-        '200/bota_200/bota','200/molcajete_200/molcajete','200/teclado_200/teclado',
-        '200/unicel_l2/unicel','200/zapato_l2/zapato']
-sample_size = [15000, 25000]
-all_data=[]
+         '200/bota_200/bota','200/molcajete_200/molcajete','200/teclado_200/teclado',
+         '200/unicel_l2/unicel','200/zapato_l2/zapato']
+sample_size = [5000]
+all_data = []
 
-target = 0
-umbral_min = 0.0
-umbral_max = 0.6
-for i in range(1, 201):
-     for j in sample_size:
-        data = visualize(names[0] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
+targets = [0, 1, 2, 3, 4, 5]
+umbral_min_max = [(0.0, 0.6), (0.0, 10.05), (0.07, 10.05), (0.0, 10.0), (0.0, 10.0), (0.0, 10.0)]
 
-target = 1
-umbral_min = 0.0
-umbral_max = 10.05
-for i in range(1, 201):
-     for j in sample_size:
-        data = visualize(names[1] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-
-target = 2
-umbral_min = 0.07
-umbral_max = 10.05
-for i in range(1, 201):
-     for j in sample_size:
-        data = visualize(names[2] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-
-target = 3
-umbral_min = 0.0
-umbral_max = 10.0
-for i in range(1, 201):
-    for j in sample_size:
-        data = visualize(names[3] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-
-target = 4
-umbral_min = 0.0
-umbral_max = 10.0
-for i in range(1, 201):
-    for j in sample_size:
-        data = visualize(names[4] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-
-target = 5
-umbral_min = 0.0
-umbral_max = 10.0
-for i in range(1, 201):
-    for j in sample_size:
-        data = visualize(names[5] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j)
-        all_data.append(data)
-
-# target = 6
-# umbral_min = 0.0
-# umbral_max = 10.0
-# for i in range(1, 201):
-#     for j in sample_size:
-#         data = visualize(names[6] + str(i) + '.csv', umbral_min, umbral_max, 2, 0.0, j)
-#         all_data.append(data)
-
-# target = 7
-# umbral_min = 0.0
-# umbral_max = 10.0
-# for i in range(1, 201):
-#     for j in sample_size:
-#         data = visualize(names[7] + str(i) + '.csv', umbral_min, umbral_max, 2, 0.0, j)
-#         all_data.append(data)
+for target, (umbral_min, umbral_max) in zip(targets, umbral_min_max):
+    st = time.time()
+    for i in range(1, 201):
+        for j in sample_size:
+            data = visualize(names[target] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j, target)
+            all_data.append(data)
+    ft = time.time()
+    print(names[target]," tomó ", ft-st, "s.")
 
 combined = np.vstack(all_data)
-output_file = 'output/database.csv'
-header = 'Mean_Nx,Mean_Ny,Mean_Nz,Mean_Curvature,AABB_Width,AABB_Height,AABB_Depth,OBB_Width,OBB_Height,OBB_Depth,Major_Axis_Horizontal,Major_Axis_Vertical,Target'
+output_file = 'output/database2.csv'
+header = 'Mean_Nx,Mean_Ny,Mean_Nz,Mean_Curvature,OBB_Width,OBB_Height,OBB_Depth,Major_Axis_Horizontal,Major_Axis_Vertical,Convex_Hull_Volume,Surface_Area,Concavity,Target'
 np.savetxt(output_file, combined, delimiter=',', header=header, comments='')
+
+end = time.time()
+print("Duration = ", end - start)
