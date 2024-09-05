@@ -1,0 +1,30 @@
+MongoDB - Basada en documentos:
+
+{
+  id_: 'holaa'
+  nombre: 'alex'
+  profesor: 'yair'
+} //documento
+
+[
+  {
+    id_: 'holaa'
+    nombre: 'alex'
+    profesor: 'yair'
+  }
+  {
+    id_: 'holaa'
+    nombre: 'alex'
+    profesor: 'yair'
+  }
+  {
+    id_: 'holaa'
+    nombre: 'alex'
+    profesor: 'yair'
+  }
+  {
+    id_: 'holaa'
+    nombre: 'alex'
+    profesor: 'yair'
+  }
+] // colección de documentos llamada colección
