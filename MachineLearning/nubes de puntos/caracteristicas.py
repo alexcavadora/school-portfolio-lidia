@@ -119,7 +119,7 @@ def visualize(file, umin, umax, norm, y_start, n_sample, target):
     roughness = compute_roughness(filtered_points)
 
     single_row_data = np.hstack([
-        mean_normals,  # Mean normal vectors
+        mean_normals,               # 3 features: Mean normal vectors (x, y, z)
         mean_curvature,             # 1 feature: mean curvature
         obb_extent,                 # 3 features: OBB extents (width, height, depth)
         obb_volume,                 # 1 feature: OBB volume
@@ -137,7 +137,7 @@ def visualize(file, umin, umax, norm, y_start, n_sample, target):
 names = ['200/audifonos_200/audifonos', '200/carro_200/carro','200/bolsa_200/bolsa',
          '200/bota_200/bota','200/molcajete_200/molcajete','200/teclado_200/teclado',
          '200/unicel_l2/unicel','200/zapato_l2/zapato']
-sample_size = [5000]
+sample_size = [10000]
 all_data = []
 
 targets = [0, 1, 2, 3, 4, 5]
