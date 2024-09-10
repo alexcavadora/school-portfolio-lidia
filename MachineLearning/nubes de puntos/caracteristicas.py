@@ -1,11 +1,14 @@
 import numpy as np
 import scipy.spatial as spatial
 from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.art3d import Poly3DCollection
+import open3d as o3d
 import time
 
 start = time.time()
 
-def read_and_clean(file, umin, umax, norm, y_start):
+def read_and_clean(file, umin, umax, norm, y_start, id):
     X = np.genfromtxt(file, delimiter=',')
     l1_norms = np.sum(np.abs(X), axis=1)
     l2_norms = np.linalg.norm(X, axis=1)
@@ -92,11 +95,26 @@ def compute_roughness(points, k=30):
 
     return np.mean(roughness_values)
 
-def visualize(file, umin, umax, norm, y_start, n_sample, target):
-    filtered_points = read_and_clean(file, umin, umax, norm, y_start)
+def visualize(file, umin, umax, norm, y_start, n_sample, target, id):
+
+    filtered_points = read_and_clean(file, umin, umax, norm, y_start, id )
     if n_sample > filtered_points.shape[0]:
         n_sample = filtered_points.shape[0]
+
+    if id == 50:
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(filtered_points[:, :3])  # Assuming the first three columns are x, y, z coordinates
+
+        # Visualize the point cloud
+        o3d.visualization.draw_geometries([pcd], window_name=file)
     filtered_points = filtered_points[np.random.choice(filtered_points.shape[0], n_sample, replace=False)]
+
+    if id == 50:
+        pcd = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(filtered_points[:, :3])  # Assuming the first three columns are x, y, z coordinates
+
+        # Visualize the point cloud
+        o3d.visualization.draw_geometries([pcd], window_name=file)
 
     curvatures = compute_curvature(filtered_points)
     mean_curvature = curvatures.mean()
@@ -134,20 +152,20 @@ def visualize(file, umin, umax, norm, y_start, n_sample, target):
     return single_row_data.reshape(1, -1)
 
 # Processing data
-names = ['200/audifonos_200/audifonos', '200/carro_200/carro','200/bolsa_200/bolsa',
-         '200/bota_200/bota','200/molcajete_200/molcajete','200/teclado_200/teclado',
-         '200/unicel_l2/unicel','200/zapato_l2/zapato']
+names = ['200/audifonos_200/audifonos', '200/carro_200/carro', '200/bolsa_200/bolsa',
+         '200/bota_200/bota', '200/molcajete_200/molcajete', '200/teclado_200/teclado',
+         '200/trofeo_200/trofeo', '200/murphy_200/murphy']
 sample_size = [10000]
 all_data = []
 
-targets = [0, 1, 2, 3, 4, 5]
-umbral_min_max = [(0.0, 0.6), (0.0, 10.05), (0.07, 10.05), (0.0, 10.0), (0.0, 10.0), (0.0, 10.0)]
+targets = [6, 7]
+umbral_min_max = [(0.0, 100), (0.0, 100.05), (0.07, 100.05), (0.0, 100.0), (0.0, 100.0), (0.0, 100.0)]
 
 for target, (umbral_min, umbral_max) in zip(targets, umbral_min_max):
     st = time.time()
     for i in range(1, 201):
         for j in sample_size:
-            data = visualize(names[target] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j, target)
+            data = visualize(names[target] + str(i) + '.csv', umbral_min, umbral_max, 1, 0.0, j, target, i)
             all_data.append(data)
     ft = time.time()
     print(names[target]," tomó ", ft-st, "s.")
