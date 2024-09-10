@@ -51,20 +51,15 @@ def compute_convex_hull_volume(points):
     hull = spatial.ConvexHull(points)
     return hull.volume
 
+def tetrahedron_volume(tetra):
+    a, b, c, d = tetra
+    return np.abs(np.dot(a - d, np.cross(b - d, c - d))) / 6.0
+    
 def compute_actual_volume(points):
-    """
-    Approximate the actual volume enclosed by the point cloud using Delaunay triangulation.
-    """
+
     delaunay = spatial.Delaunay(points)
     simplices = delaunay.simplices
     tetrahedra = points[simplices]
-
-    def tetrahedron_volume(tetra):
-        """
-        Calculate the volume of a tetrahedron given its vertices.
-        """
-        a, b, c, d = tetra
-        return np.abs(np.dot(a - d, np.cross(b - d, c - d))) / 6.0
 
     volumes = np.array([tetrahedron_volume(tetra) for tetra in tetrahedra])
     return np.sum(volumes)

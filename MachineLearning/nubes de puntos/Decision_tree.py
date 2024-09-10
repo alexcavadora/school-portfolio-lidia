@@ -26,7 +26,10 @@ ada = AdaBoostClassifier(estimator=DecisionTreeClassifier(max_depth=4),algorithm
 # Evaluar DecisionTreeClassifier con validación cruzada
 scores = cross_val_score(clf, X, y, cv=10)
 print("Puntuación media de DecisionTree: ", scores.mean())
-
+end_time = time.time()
+elapsed_time = end_time - start_time
+print(f"Tiempo de ejecución: {elapsed_time} segundos")
+start_time= time.time()
 # clf.fit(X_train, y_train)
 # test_score = clf.score(X_test, y_test)
 # print("Puntuación en el conjunto de prueba de DecisionTree: ", test_score)
@@ -34,7 +37,10 @@ print("Puntuación media de DecisionTree: ", scores.mean())
 # Evaluar RandomForestClassifier con validación cruzada
 scores = cross_val_score(rf, X, y, cv=10)
 print("Puntuación media de RandomForest: ", scores.mean())
-
+end_time = time.time()
+elapsed_time = end_time - start_time
+print(f"Tiempo de ejecución: {elapsed_time} segundos")
+start_time= time.time()
 # rf.fit(X_train, y_train)
 # test_score = rf.score(X_test, y_test)
 # print("Puntuación en el conjunto de prueba de RandomForest: ", test_score)
@@ -42,12 +48,9 @@ print("Puntuación media de RandomForest: ", scores.mean())
 # Evaluar AdaBoostClassifier con validación cruzada
 scores = cross_val_score(ada, X, y, cv=10)
 print("Puntuación media de AdaBoost: ", scores.mean())
-
-# ada.fit(X_train, y_train)
-# test_score = ada.score(X_test, y_test)
-# print("Puntuación en el conjunto de prueba de AdaBoost: ", test_score)
-
-# Medir el tiempo de ejecución
 end_time = time.time()
 elapsed_time = end_time - start_time
 print(f"Tiempo de ejecución: {elapsed_time} segundos")
+# ada.fit(X_train, y_train)
+# test_score = ada.score(X_test, y_test)
+# print("Puntuación en el conjunto de prueba de AdaBoost: ", test_score)
