@@ -18,18 +18,18 @@ def read_and_clean(file, umin, umax, norm, y_start, id):
     l1_mask &= y_mask
     l2_mask &= y_mask
 
-    if norm == 1:
-        filtered_points = X[l1_mask]
-    elif norm == 2:
-        filtered_points = X[l2_mask]
-    else:
-        filtered_points = np.array([])
+if norm == 1:
+    filtered_points = X[l1_mask]
+elif norm == 2:
+    filtered_points = X[l2_mask]
+else:
+    filtered_points = np.array([])
 
-    return filtered_points
+return filtered_points
 
 def compute_curvature(points, k=30):
-    kdtree = spatial.KDTree(points)
-    curvatures = []
+kdtree = spatial.KDTree(points)
+curvatures = []
 
     for i in range(len(points)):
         _, idx = kdtree.query(points[i], k=k)
@@ -54,7 +54,7 @@ def compute_convex_hull_volume(points):
 def tetrahedron_volume(tetra):
     a, b, c, d = tetra
     return np.abs(np.dot(a - d, np.cross(b - d, c - d))) / 6.0
-    
+
 def compute_actual_volume(points):
 
     delaunay = spatial.Delaunay(points)

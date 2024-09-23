@@ -27,7 +27,8 @@ void error_msg(const char * msg)
 }
 
 
-void* pi_digits( void* arg){
+void* pi_digits( void* arg)
+{
     u_int64_t k;
     double sum = 0.0;
     const int label = *((int*) arg);
@@ -86,15 +87,15 @@ int main(int argc, char** argv)
     g_label = malloc(g_tnum * sizeof(int)); // indices for the thread
     if (g_label == NULL) error_msg("Couldn't initiate threads, free some memory.");
 
-    for (int i = 0; i < g_tnum; i++) g_label[i] = i;
+    for (int i = 0; i < g_tnum; i++)
+        g_label[i] = i;
 
-    for(int i = 0; i < g_tnum; i++){
+    for(int i = 0; i < g_tnum; i++)
         pthread_create(&tlist[i], NULL, pi_digits, &g_label[i]);
-    }
 
-    for(int i = 0; i < g_tnum; i++){
+    for(int i = 0; i < g_tnum; i++)
         pthread_join(tlist[i], NULL);
-    }
+
     cr_pi *= 4.0;
     printf("pi ≈ %.25g\n", cr_pi);
     free(tlist);
