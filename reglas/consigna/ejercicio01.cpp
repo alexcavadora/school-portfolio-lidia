@@ -13,7 +13,7 @@ int main()
             cout << "En el rango."<< endl;
         if ((int) x[i] == x[i] && x[i] != 0)
             cout << "Entero."<< endl;
-        if ((int) x[i]%13 == 0)
+        if ((int) x[i] % 13 == 0)
             cout << "Múltiplo de 13."<< endl;
     }
 

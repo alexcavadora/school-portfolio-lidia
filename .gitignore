@@ -1,3 +1,8 @@
 *.DS_Store
+*__pychache__/
 MachineLearning/nubes de puntos/.DS_Store
 MachineLearning/nubes de puntos/200
+MachineLearning/conv/img*
+MachineLearning/conv/munster*
+MachineLearning/histogram/RAW_SIGNALS_SF*
+multithreadding/conv04/img*
