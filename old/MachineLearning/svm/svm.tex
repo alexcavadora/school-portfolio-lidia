@@ -1,0 +1,53 @@
+\section{SVM: Análisis de Modelos de Support Vector Machines}
+
+En esta sección, se presentan los resultados obtenidos al aplicar cuatro modelos de Support Vector Machine (SVM) con diferentes grados polinomiales, utilizando características extraídas de esqueletos humanos, tales como distancias entre puntos clave del cuerpo, velocidades de movimiento y otros parámetros relacionados.
+
+\input{svm-mathematical-definition.tex}
+
+A continuación, se analiza el rendimiento de cada modelo y se discute la selección adecuada de modelos, con especial atención a la posible sobreajuste del modelo de quinto grado, observado en los resultados.
+
+\subsection{Linear SVM}
+El modelo \textit{Linear SVM} mostró un rendimiento perfecto tanto en el conjunto de entrenamiento como en el de prueba, con una precisión, F1, precisión y recall de 1.00 en ambos casos. Estos resultados indican que el modelo fue capaz de clasificar correctamente todas las muestras en ambas fases. El tiempo de entrenamiento y prueba es extremadamente bajo, lo que sugiere que el modelo es eficiente y adecuado para manejar datos de características de esqueletos, sin sobrecargar el sistema computacional.
+
+Aunque los resultados son excelentes, la precisión perfecta puede no ser representativa de un modelo robusto, especialmente si los datos no son lo suficientemente complejos para que un modelo lineal logre distinciones significativas. El Linear SVM podría ser adecuado si las relaciones entre las características (por ejemplo, distancias y velocidades) son principalmente lineales, pero podría no ser capaz de capturar complejidades en los patrones de movimiento o estructura de los esqueletos.
+
+\subsection{Quadratic SVM (Degree 2)}
+El modelo \textit{Quadratic SVM (Grado 2)} también presenta un rendimiento perfecto, con valores de precisión, F1, precisión y recall de 1.00 en ambos conjuntos de datos. Los tiempos de ejecución son ligeramente mayores que los del modelo lineal, pero todavía muy rápidos. Este modelo tiene la capacidad de capturar relaciones no lineales más complejas que un modelo lineal, lo que es útil en el caso de los datos de esqueletos, donde las distancias y las velocidades entre las distintas partes del cuerpo pueden tener interacciones no lineales.
+
+Al igual que el modelo lineal, la perfección de los resultados sugiere que el modelo cuadrático puede ser adecuado para los datos, ya que ofrece una frontera de decisión más flexible sin introducir una complejidad excesiva. Sin embargo, si los datos tienen interacciones mucho más complejas, el modelo cuadrático podría quedarse corto, por lo que podría ser útil evaluar modelos de grados superiores.
+
+\subsection{Cubic SVM (Degree 3)}
+El modelo \textit{Cubic SVM (Grado 3)} también muestra resultados perfectos en términos de precisión y métricas asociadas. Este modelo es adecuado cuando las relaciones entre las características de los esqueletos son aún más complejas, capturando interacciones de orden superior entre las distancias y velocidades de las distintas articulaciones. El tiempo de entrenamiento y prueba sigue siendo razonablemente bajo, lo que indica que el aumento en la complejidad no afecta significativamente la eficiencia computacional.
+
+Aunque los resultados son ideales, es importante tener en cuenta que la complejidad adicional de este modelo podría no ser necesaria si los datos no requieren una frontera de decisión tan flexible. Si bien el modelo cúbico puede manejar relaciones no lineales complejas, podría ser innecesario si los datos son suficientemente bien representados por modelos de menor grado.
+
+\subsection{Fifth-degree SVM (Degree 5)}
+El modelo \textit{Fifth-degree SVM} (Grado 5) mostró un rendimiento ligeramente inferior al de los modelos anteriores. La precisión de prueba fue de 0.88, con un F1 de 0.87, lo que indica que el modelo de quinto grado se ajustó demasiado bien al conjunto de entrenamiento, pero no generalizó tan bien al conjunto de prueba. Aunque la precisión en el conjunto de entrenamiento es alta (0.92), la diferencia con el conjunto de prueba sugiere un sobreajuste, un comportamiento típico en modelos de alta complejidad como el de grado 5.
+
+El modelo de quinto grado es capaz de capturar patrones muy complejos, pero es probable que esté ajustando ruido o fluctuaciones específicas del conjunto de entrenamiento, lo que lo hace menos efectivo para predecir nuevos datos. En el contexto de los datos de esqueletos, es posible que las relaciones entre las características sean lo suficientemente complejas como para que un modelo de grado 5 no sea necesario, ya que podría ser demasiado específico para los datos de entrenamiento y perder capacidad de generalización.
+
+\subsection{Modelos recomendados}
+Los resultados sugieren que los modelos de menor grado (SVM lineales, cuadráticos y cúbicos) son adecuados para los datos de esqueletos, ya que pueden captar las interacciones clave entre las distancias, velocidades y otros parámetros sin sobreajustarse a los datos de entrenamiento. En comparación, el modelo de quinto grado ha mostrado signos de sobreajuste debido a la disminución en la precisión en el conjunto de prueba. Esto indica que, aunque un modelo de mayor grado puede parecer atractivo por su flexibilidad, no siempre es la mejor opción si los datos no requieren tanta complejidad.
+
+\subsection{Tabla de Resultados}
+
+A continuación, se presenta una tabla resumen de los resultados obtenidos para cada modelo, con sus respectivas métricas de rendimiento:
+
+\begin{table}[h!]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|}
+\hline*0.5
+\multirow{2}{*}{Modelo} & \multirow{2}{*}{Precisión de Entrenamiento} & \multirow{2}{*}{Precisión de Prueba} & \multirow{2}{*}{F1 Score} & \multirow{2}{*}{Precisión} & \multirow{2}{*}{Recall} & \multirow{2}{*}{Tiempo de Entrenamiento (segundos)} & \multirow{2}{*}{Tiempo de Prueba (segundos)} \\
+& & & & & & & \\
+\hline*0.5
+Linear SVM & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 0.0025 & 0.0005 \\
+\hline*0.5
+Quadratic SVM (Grado 2) & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 0.0024 & 0.0006 \\
+\hline*0.5
+Cubic SVM (Grado 3) & 1.00 & 1.00 & 1.00 & 1.00 & 1.00 & 0.0023 & 0.0006 \\
+\hline*0.5
+Fifth-degree SVM (Grado 5) & 0.92 & 0.88 & 0.87 & 0.90 & 0.88 & 0.0027 & 0.0007 \\
+\hline*0.5
+\end{tabular}
+\caption{Resumen de los resultados obtenidos para cada modelo de SVM aplicado a características extraídas de esqueletos.}
+\end{table}
