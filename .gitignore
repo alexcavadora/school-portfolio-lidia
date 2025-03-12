@@ -25,3 +25,10 @@ old/datamining/tsa/Analysis/Avance Proyeto Probabilidad/Serial Time/Rplot06.png
 old/datamining/tsa/Analysis/Avance Proyeto Probabilidad/Serial Time/Rplot07.png
 /old/datamining/tsa/Analysis/Avance Proyeto Probabilidad/Plots
 /neural networks/tutorial
+/neural networks/pytorch_perceptron/__pycache__
+/neural networks/data/MNIST/raw
+datavisualization/excercise05/firms_data.txt
+/neural networks/pytorch_perceptron/__pycache__
+/neural networks/pytorch_perceptron/__pycache__
+*.pyc
+neural networks/pytorch_perceptron/__pycache__/models.cpython-310.pyc
