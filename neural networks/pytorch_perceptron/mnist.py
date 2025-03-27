@@ -16,7 +16,7 @@ hidden_size = 64
 output_size = 10
 learning_rate = 0.01
 batch_size = 64
-epochs = 25
+epochs = 50
 
 train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
@@ -54,7 +54,10 @@ for epoch in range(epochs):
     if (epoch % 10) == 0:
         print(f"Epoch {epoch}: Train loss {history['train_loss'][-1]}, Test loss {history['test_loss'][-1]}")
 
+
 end_time = time.time()
+torch.save(model.state_dict(), "mnist_mlp.pth")
+print("Model saved as mnist_mlp.pth")
 
 plt.figure()
 plt.plot(history['train_loss'], label='Train loss')

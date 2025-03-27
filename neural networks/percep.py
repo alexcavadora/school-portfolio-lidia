@@ -37,7 +37,7 @@ class Perceptron:
 if __name__ == '__main__':
     p = Perceptron(2)
     inputs = np.array([[0, 0], [0, 1], [1, 0], [1, 1]])
-    outputs = np.array([1, 0, 0, 0])  # Binary classification task
+    outputs = np.array([1, 0, 0, 0])
     p.fit(inputs, outputs, lr=0.5, epochs=1000)
 
     # Test the trained perceptron

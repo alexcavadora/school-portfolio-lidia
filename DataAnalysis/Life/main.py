@@ -1,164 +1,121 @@
 #%%
-# Paso 1: Leer el archivo
+# Step 1: Read data
 import pandas as pd
-
-# Cargar el archivo transfusion.data
 transfusion = pd.read_csv("transfusion.data")
-
-# Mostrar las primeras 5 líneas del archivo
 print(transfusion.head())
-#%%
-# Imprimir un resumen conciso del DataFrame
-print(transfusion.info())
-#%%
-# Renombrar la columna 'whether he/she donated blood in March 2007' a 'target'
-transfusion.rename(columns={'whether he/she donated blood in March 2007': 'target'}, inplace=True)
 
-# Verificar el cambio
+#%%
+# Step 2: Data info
+print(transfusion.info())
+
+#%%
+# Step 3: Rename target column
+transfusion.rename(columns={'whether he/she donated blood in March 2007': 'target'}, inplace=True)
 print(transfusion.head(2))
+
 #%%
-# Imprimir la incidencia objetivo
+# Step 4: Target distribution
 print(transfusion['target'].value_counts(normalize=True).round(3))
+
 #%%
+# Step 5: Initial split
 from sklearn.model_selection import train_test_split
 
-# Dividir el conjunto de datos en original y reserva
-X_original, X_reserva, y_original, y_reserva = train_test_split(transfusion.drop('target', axis=1), transfusion['target'], test_size=0.2, random_state=42, stratify=transfusion['target'])
+X = transfusion.drop('target', axis=1)
+y = transfusion['target']
 
-# Verificar la división
-print(X_original.head(2))
-
-#%%
-# Dividir el conjunto de datos original en entrenamiento y prueba
-X_train, X_test, y_train, y_test = train_test_split(X_original, y_original, test_size=0.25, random_state=42, stratify=y_original)
-
-# Verificar la división
-print(X_train.head(2))
+# Split into temp and final test set
+X_temp, X_reserva, y_temp, y_reserva = train_test_split(
+    X, y, 
+    test_size=0.2, 
+    random_state=42, 
+    stratify=y
+)
 
 #%%
+# Step 6: Train-validation split
+X_train, X_test, y_train, y_test = train_test_split(
+    X_temp, y_temp,
+    test_size=0.25,
+    random_state=42,
+    stratify=y_temp
+)
+
+#%%
+# Step 7: TPOT setup (updated parameters)
+#import os
+#os.environ["TPOT_NO_DASK"] = "true"
 from tpot import TPOTClassifier
 from sklearn.metrics import roc_auc_score
 
-# Crear una instancia de TPOTClassifier
-tpot = TPOTClassifier(generations=5, population_size=20, verbose=2, scorers='roc_auc', random_state=42)
+# Updated TPOT configuration
+tpot = TPOTClassifier(
+    generations=5,
+    population_size=20,
+    cv=5,
+    scorers=['roc_auc'],  # Correct parameter name for scoring
+    scorers_weights=[1.0],  # Weight for the scorer
+    verbose=2,
+    random_state=42,
+    n_jobs=-1
+)
 
-# Ajustar el modelo
 tpot.fit(X_train, y_train)
 
-# Estimar el área bajo la curva ROC (AUC)
-tpot_auc_score = roc_auc_score(y_test, tpot.predict_proba(X_test)[:, 1])
-print(f"AUC score: {tpot_auc_score:.4f}")
+# Evaluation
+tpot_auc = roc_auc_score(y_test, tpot.predict_proba(X_test)[:, 1])
+print(f"TPOT AUC: {tpot_auc:.4f}")
 
-# Mostrar el mejor pipeline
-print("El mejor pipeline es:")
-for idx, (name, transform) in enumerate(tpot.fitted_pipeline_.steps, start=1):
-    print(f"Paso {idx}: {transform}")
 #%%
-# Imprimir la varianza de X_train
-print(X_train.var().round(3))
-#%%
+# Step 8: Feature engineering
 import numpy as np
 
-# Copiar los datos de entrenamiento y prueba
-X_train_normed = X_train.copy()
-X_test_normed = X_test.copy()
-
-# Identificar la columna con la mayor varianza
+# Log-transform high-variance feature
 col_to_normalize = X_train.var().idxmax()
-
-# Log-normalizar la columna con mayor varianza
-for df in [X_train_normed, X_test_normed]:
+for df in [X_train, X_test, X_temp, X_reserva]:
     df['monetary_log'] = np.log(df[col_to_normalize])
     df.drop(col_to_normalize, axis=1, inplace=True)
 
-# Verificar la varianza después de la normalización
-print(X_train_normed.var().round(3))
 #%%
+# Step 9: Logistic regression baseline
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import roc_auc_score
 
-# Crear una instancia de LogisticRegression
-logreg = LogisticRegression(solver='sag', max_iter=100, random_state=42)
+logreg = LogisticRegression(solver='saga', max_iter=1000, random_state=42)
+logreg.fit(X_train, y_train)
+logreg_auc = roc_auc_score(y_test, logreg.predict_proba(X_test)[:, 1])
+print(f"Baseline AUC: {logreg_auc:.4f}")
 
-# Entrenar el modelo
-logreg.fit(X_train_normed, y_train)
-
-# Estimar el área bajo la curva ROC (AUC)
-logreg_auc_score = roc_auc_score(y_test, logreg.predict_proba(X_test_normed)[:, 1])
-print(f"AUC score: {logreg_auc_score:.4f}")
 #%%
+# Step 10: Hyperparameter tuning (fixed data usage)
 from sklearn.model_selection import GridSearchCV
 
-# Configurar la búsqueda de cuadrícula
+# Updated parameter grid with valid combinations
 param_grid = {
-    'penalty': ['l1', 'l2', 'elasticnet', 'none'],
-    'C': [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
-    'fit_intercept': [True, False],
-    'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
-    'max_iter': [100, 1000, 2500, 5000]
+    'penalty': ['l1', 'l2', 'elasticnet'],
+    'C': [0.01, 0.1, 1, 10],
+    'solver': ['saga'],  # Only solver supporting all penalties
+    'l1_ratio': [0.3, 0.5, 0.7]
 }
 
-# Crear la instancia de GridSearchCV
-logreg_cv = GridSearchCV(LogisticRegression(), param_grid, scoring='roc_auc', cv=5, verbose=True, n_jobs=-1)
+logreg_cv = GridSearchCV(
+    LogisticRegression(max_iter=1000, random_state=42),
+    param_grid,
+    scoring='roc_auc',
+    cv=5,
+    n_jobs=-1
+)
 
-# Ajustar el modelo
-logreg_cv.fit(X_test_normed, y_test)
+# Corrected to use training data
+logreg_cv.fit(X_train, y_train)
 
-# Imprimir el mejor parámetro y AUC calculado
-print(f"Mejores parámetros: {logreg_cv.best_params_}")
-print(f"AUC score: {logreg_cv.best_score_:.4f}")
+print(f"Best params: {logreg_cv.best_params_}")
+best_auc = roc_auc_score(y_test, logreg_cv.predict_proba(X_test)[:, 1])
+print(f"Tuned AUC: {best_auc:.4f}")
+
 #%%
-# Copiar los datos originales y de reserva
-X_original_normed = X_original.copy()
-X_reserva_normed = X_reserva.copy()
-
-# Log-normalizar la columna con mayor varianza
-for df in [X_original_normed, X_reserva_normed]:
-    df['monetary_log'] = np.log(df[col_to_normalize])
-    df.drop(col_to_normalize, axis=1, inplace=True)
-
-# Verificar la varianza después de la normalización
-print(X_reserva_normed.var().round(3))
-#%%
-# Crear una instancia de LogisticRegression con los mejores hiperparámetros
-logreg_reserva = LogisticRegression(**logreg_cv.best_params_)
-
-# Ajustar el modelo con los datos de reserva
-logreg_reserva.fit(X_reserva_normed, y_reserva)
-
-# Estimar el área bajo la curva ROC (AUC)
-logreg_reserva_auc_score = roc_auc_score(y_reserva, logreg_reserva.predict_proba(X_reserva_normed)[:, 1])
-print(f"AUC score: {logreg_reserva_auc_score:.4f}")
-#%%
-from sklearn.model_selection import GridSearchCV
-
-# Configurar la búsqueda de cuadrícula
-param_grid = {
-    'penalty': ['l1', 'l2', 'elasticnet', 'none'],
-    'C': [0.0001, 0.001, 0.01, 0.1, 1, 10, 100, 1000],
-    'fit_intercept': [True, False],
-    'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
-    'max_iter': [100, 1000, 2500, 5000]
-}
-
-# Crear la instancia de GridSearchCV
-logreg_cv = GridSearchCV(LogisticRegression(), param_grid, scoring='roc_auc', cv=5, verbose=True, n_jobs=-1)
-
-# Ajustar el modelo
-logreg_cv.fit(X_test_normed, y_test)
-
-# Imprimir el mejor parámetro y AUC calculado
-print(f"Mejores parámetros: {logreg_cv.best_params_}")
-print(f"AUC score: {logreg_cv.best_score_:.4f}")
-#%%
-# Copiar los datos originales y de reserva
-X_original_normed = X_original.copy()
-X_reserva_normed = X_reserva.copy()
-
-# Log-normalizar la columna con mayor varianza
-for df in [X_original_normed, X_reserva_normed]:
-    df['monetary_log'] = np.log(df[col_to_normalize])
-    df.drop(col_to_normalize, axis=1, inplace=True)
-
-# Verificar la varianza después de la normalización
-print(X_reserva_normed.var().round(3))
+# Step 11: Final evaluation on holdout set
+final_model = logreg_cv.best_estimator_
+final_model.fit(X_temp, y_temp)  # Train on full temp data
+reserva_auc = roc_auc_score(y_reserva, final_model.predict_proba(X_reserva)[:, 1])
+print(f"Final Holdout AUC: {reserva_auc:.4f}")
+# %%
