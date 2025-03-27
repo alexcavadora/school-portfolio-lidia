@@ -25,4 +25,16 @@ old/datamining/tsa/Analysis/Avance Proyeto Probabilidad/Serial Time/Rplot06.png
 old/datamining/tsa/Analysis/Avance Proyeto Probabilidad/Serial Time/Rplot07.png
 /old/datamining/tsa/Analysis/Avance Proyeto Probabilidad/Plots
 /neural networks/tutorial
+<<<<<<< HEAD
 evolutionary computation/ackley function/steps.png
+=======
+/neural networks/pytorch_perceptron/__pycache__
+/neural networks/data/MNIST/raw
+datavisualization/excercise05/firms_data.txt
+/neural networks/pytorch_perceptron/__pycache__
+/neural networks/pytorch_perceptron/__pycache__
+*.pyc
+neural networks/pytorch_perceptron/__pycache__/models.cpython-310.pyc
+neural networks/endpoint/kuatro.png
+datavisualization/project/studious-stack-455023-d0-5a97eb750fa4.json
+>>>>>>> faffbed272333252ce43d24da0c803c7dd1e7d7a
