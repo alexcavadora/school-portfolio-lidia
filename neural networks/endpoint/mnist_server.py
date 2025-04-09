@@ -12,8 +12,8 @@ import io
 
 
 input_size = 28*28
-
-model  = torch.load("mnist_model.pth")
+model = MLP()
+model  = torch.load_state_dict("mnist_model.pth")
 model.to("cpu")
 
 transform = transforms.Compose([

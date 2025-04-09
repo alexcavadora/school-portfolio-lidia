@@ -8,15 +8,15 @@ from data.datasets import get_mnist
 from pytorch_perceptron.models import MLP
 from pytorch_perceptron.pytorch_utils import get_device
 
-device = torch.device('cpu')#get_device()
+device = get_device()
 train_ds, test_ds = get_mnist()
 
 input_size = 28 * 28
 hidden_size = 64
 output_size = 10
-learning_rate = 0.01
+learning_rate = 0.1
 batch_size = 64
-epochs = 50
+epochs = 100
 
 train_loader = DataLoader(train_ds, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_ds, batch_size=batch_size, shuffle=False)
