@@ -1,0 +1,37 @@
+def get_greedy_individual(self):
+    """Generate initial solution using nearest neighbor with capacity constraints"""
+    nodes = list(range(0, self.parser.dimension - 1))
+    routes = []
+    unvisited = set(nodes)
+    depot = self.parser.depot - 1
+    vehicle_capacity = getattr(self.parser, 'capacity', float('inf'))
+    demands = getattr(self.parser, 'demands', [1] * self.parser.dimension)
+    
+    while unvisited:
+        current = depot
+        route = []
+        current_demand = 0
+        
+        while unvisited:
+            # Calculate distances and demands for remaining nodes
+            candidates = []
+            for node in unvisited:
+                distance = self.parser.edge_weights[current][node]
+                demand = demands[node]
+                if current_demand + demand <= vehicle_capacity:
+                    candidates.append((node, distance))
+                    
+            if not candidates:
+                break
+                
+            # Select closest feasible node
+            next_node = min(candidates, key=lambda x: x[1])[0]
+            route.append(next_node)
+            current_demand += demands[next_node]
+            unvisited.remove(next_node)
+            current = next_node
+            
+        if route:
+            routes.append(route)
+            
+    return routes
