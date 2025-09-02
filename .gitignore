@@ -1,5 +1,6 @@
 *.DS_Store
 *__pychache__/
+*octave-workspace
 MachineLearning/nubes de puntos/.DS_Store
 MachineLearning/nubes de puntos/200
 MachineLearning/conv/img*
@@ -46,3 +47,5 @@ datavisualization/project/studious-stack-455023-d0-5a97eb750fa4.json
 DataAnalysis/midterm2/parte2/best_model.pkl
 old/DataAnalysis/midterm2/parte2/best_model.pkl
 old/datavisualization/taxi/processed_taxi_data.pkl
+/Big data/data
+/Deep Learning/conv/data

@@ -50,5 +50,3 @@ img_abstract1 = uint8(cat(3,green_channel, blue_channel, red_channel));
 
 img_abstract2 = uint8(cat(3,blue_channel, red_channel, green_channel));
 #figure(8), imshow(img_abstract2), title("Abstract Image");
-
-
