@@ -1,10 +1,11 @@
 % Segmentacion. Es la agrupacion y clasificacio de pixeles conexos que
 % siguen un conujunto de reglas o atributos comunes como color, textura,
-% forma o contexto. 
+% forma o contexto.
 
 % Metodos de clasificacion: Umbralizacion, color, textura, semantica.
 
 % Segmentacion por umbralizacion. Se basa en histograma.
+
 
 function main
     clear all, close all, clc;
@@ -23,7 +24,7 @@ function main
     [P1, G1] = histG(Int);
     figure(3), plot(k, P1);
     figure(4), plot(k, G1);
-    
+
     Th = 0.68;
     %for k = 1:255
     %    if G1(k) >= Th, break; end
@@ -46,13 +47,13 @@ function main
 
     MuT = sum(k.*P1)
     VarT = sum(((k-MuT).^2).*P1)
-    
+
 
     %figure(5), imshow(Io)
 end
 
 function [P, G] = histG(Im)
-    [H,W,nC] = size(Im); 
+    [H,W,nC] = size(Im);
     hist = zeros(256,1);
     G = zeros(256,1);
     for j = 1:H
@@ -62,9 +63,9 @@ function [P, G] = histG(Im)
         end
     end
     P = hist/(H*W);
-    
+
     G(1) = P(1);
     for k=2:256
        G(k) = G(k-1) + P(k);
     end
-end 
+end
