@@ -46,3 +46,7 @@ old/DataAnalysis/midterm2/parte2/best_model.pkl
 old/datavisualization/taxi/processed_taxi_data.pkl
 /Big data/data
 /Deep Learning/conv/data
+Big data/epsilon_small_package 2/epsilon_small/train_feature_idx.npy
+Big data/epsilon_small_package 2/epsilon_small/train_X.npy
+Big data/epsilon_small_package
+Big data/epsilon_small_package 2/epsilon_small/train_y.npy
